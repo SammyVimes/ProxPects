@@ -28,7 +28,7 @@ public class AspectBinder {
                                                                              final Class<INTERFACE> interfaceClass) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class objectClass = object.getClass();
         Method[] declaredMethods = interfaceClass.getDeclaredMethods();
-        RootInvocationHandler rootHandler = handlersMap.get(objectClass); //TODO: put root into map
+        RootInvocationHandler rootHandler = handlersMap.get(objectClass);
         if (rootHandler == null) {
             Map<RootInvocationHandler.MethodWrapper, ChainedInvocationHandler> methodHandlerMap = new HashMap<>();
             for (Method method : declaredMethods) {
