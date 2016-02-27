@@ -2,6 +2,7 @@ package com.github.sammyvimes.libproxpect.proxy;
 
 import android.util.Pair;
 
+import com.github.sammyvimes.libproxpect.ReflectionHelper;
 import com.github.sammyvimes.libproxpect.annotation.Aspect;
 import com.github.sammyvimes.libproxpect.aspect.ChainedInvocationHandler;
 import com.github.sammyvimes.libproxpect.aspect.RootInvocationHandler;
@@ -32,27 +33,20 @@ public class AspectBinder {
         if (rootHandler == null) {
             Map<RootInvocationHandler.MethodWrapper, ChainedInvocationHandler> methodHandlerMap = new HashMap<>();
             for (Method method : declaredMethods) {
-                List<Pair<AnnotationAndClass, Aspect>> aspectAnnotations = new LinkedList<>();
-                Annotation[] declaredAnnotations = method.getDeclaredAnnotations();
-                for (Annotation annotation : declaredAnnotations) {
-                    Pair<AnnotationAndClass, Aspect> aspect = getAspect(annotation);
-                    if (aspect != null) {
-                        aspectAnnotations.add(aspect);
+                ChainedInvocationHandler methodHandler = processMethod(method);
+                Method overriddenMethod = ReflectionHelper.getOverriddenMethod(method, object);
+                if (overriddenMethod != null) {
+                    ChainedInvocationHandler overriddenMethodHandler = processMethod(overriddenMethod);
+                    if (overriddenMethodHandler != null) {
+                        if (methodHandler != null) {
+                            methodHandler.getBottomHandler().setNestedHandler(overriddenMethodHandler);
+                        } else {
+                            methodHandlerMap.put(new RootInvocationHandler.MethodWrapper(method), overriddenMethodHandler);
+                        }
+                    } else {
+                        methodHandlerMap.put(new RootInvocationHandler.MethodWrapper(method), methodHandler);
                     }
-                }
-                if (aspectAnnotations.size() > 0) {
-                    ChainedInvocationHandler methodHandler = null;
-                    Collections.reverse(aspectAnnotations);
-                    for (Pair<AnnotationAndClass, Aspect> aspectAnnotation : aspectAnnotations) {
-                        Aspect aspect = aspectAnnotation.second;
-                        AnnotationAndClass annotationAndClass = aspectAnnotation.first;
-                        Class<?> aspectHandler = aspect.value();
-                        Annotation annotation = annotationAndClass.annotation;
-                        Class annotationClass = annotationAndClass.aClass;
-                        ChainedInvocationHandler handler = (ChainedInvocationHandler) aspectHandler.getConstructor(annotationClass).newInstance(annotation);
-                        handler.setNestedHandler(methodHandler);
-                        methodHandler = handler;
-                    }
+                } else if (methodHandler != null) {
                     methodHandlerMap.put(new RootInvocationHandler.MethodWrapper(method), methodHandler);
                 }
             }
@@ -61,6 +55,33 @@ public class AspectBinder {
         }
         return (INTERFACE) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
                 new Class[]{interfaceClass}, new SharedInvocationHandler(object, rootHandler));
+    }
+
+    private static ChainedInvocationHandler processMethod(final Method method) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        List<Pair<AnnotationAndClass, Aspect>> aspectAnnotations = new LinkedList<>();
+        Annotation[] declaredAnnotations = method.getDeclaredAnnotations();
+        for (Annotation annotation : declaredAnnotations) {
+            Pair<AnnotationAndClass, Aspect> aspect = getAspect(annotation);
+            if (aspect != null) {
+                aspectAnnotations.add(aspect);
+            }
+        }
+        if (aspectAnnotations.size() > 0) {
+            ChainedInvocationHandler methodHandler = null;
+            Collections.reverse(aspectAnnotations);
+            for (Pair<AnnotationAndClass, Aspect> aspectAnnotation : aspectAnnotations) {
+                Aspect aspect = aspectAnnotation.second;
+                AnnotationAndClass annotationAndClass = aspectAnnotation.first;
+                Class<?> aspectHandler = aspect.value();
+                Annotation annotation = annotationAndClass.annotation;
+                Class annotationClass = annotationAndClass.aClass;
+                ChainedInvocationHandler handler = (ChainedInvocationHandler) aspectHandler.getConstructor(annotationClass).newInstance(annotation);
+                handler.setNestedHandler(methodHandler);
+                methodHandler = handler;
+            }
+            return methodHandler;
+        }
+        return null;
     }
 
     public static void registerAspects(final Class<? extends Annotation>... annotations) {

@@ -1,4 +1,4 @@
-package com.github.sammyvimes.libproxpect.aspect.base;
+package com.github.sammyvimes.libproxpect.aspect.base.cacheable;
 
 import android.app.Activity;
 
@@ -10,14 +10,12 @@ import junit.framework.TestCase;
 /**
  * Created by Semyon on 27.02.2016.
  */
-public class CacheableAspectTest extends TestCase {
+public class CacheableAspectTestInheritance extends TestCase {
 
     private interface Foo {
 
-        @Cacheable(ttl = 100000)
         String getValue();
 
-        @Cacheable(ttl = 100000)
         String getValue2();
 
     }
@@ -25,6 +23,7 @@ public class CacheableAspectTest extends TestCase {
     private class FooImpl implements Foo {
 
         @Override
+        @Cacheable(ttl = 100000)
         public String getValue() {
             return "just a value";
         }
@@ -32,6 +31,7 @@ public class CacheableAspectTest extends TestCase {
         int count = 0;
 
         @Override
+        @Cacheable(ttl = 100000)
         public String getValue2() {
             if (count == 0) {
                 count++;
@@ -57,10 +57,8 @@ public class CacheableAspectTest extends TestCase {
 
     private interface Foo2 {
 
-        @Cacheable(ttl = 100000)
         String getValue(final int i, final Activity activity);
 
-        @Cacheable(ttl = 100000)
         String getValue2(final int i, final Activity activity, final String strings);
 
     }
@@ -68,6 +66,7 @@ public class CacheableAspectTest extends TestCase {
     private class FooImpl2 implements Foo2 {
 
         @Override
+        @Cacheable(ttl = 100000)
         public String getValue(final int i, final Activity activity) {
             return "just a value";
         }
@@ -75,6 +74,7 @@ public class CacheableAspectTest extends TestCase {
         int count = 0;
 
         @Override
+        @Cacheable(ttl = 100000)
         public String getValue2(final int i, final Activity activity, final String strings) {
             if (count == 0) {
                 count++;
@@ -109,6 +109,58 @@ public class CacheableAspectTest extends TestCase {
         assertEquals("this will be cached", value2);
         value2 = proxified.getValue2(14, null, "test-string2");
         assertNotSame("this will be cached", value2);
+    }
+
+    private interface Foo3 {
+
+        String getValue(final int i, final Activity activity);
+
+        String getValue2(final int i, final Activity activity, final String strings);
+
+        String notCacheableMethod();
+
+    }
+
+    private class FooImpl3 implements Foo3 {
+
+        @Override
+        @Cacheable(ttl = 100000)
+        public String getValue(final int i, final Activity activity) {
+            return "just a value";
+        }
+
+        int count = 0;
+
+        @Override
+        @Cacheable(ttl = 100000)
+        public String getValue2(final int i, final Activity activity, final String strings) {
+            if (count == 0) {
+                count++;
+                return "this will be cached";
+            }
+            return "incorrect value";
+        }
+
+        int count2 = 0;
+
+        @Override
+        public String notCacheableMethod() {
+            if (count == 0) {
+                count++;
+                return "this can be cached";
+            }
+            return "correct value";
+        }
+
+    }
+
+    public void testNotCacheableMethod() throws Exception {
+        AspectBinder.registerAspects(Cacheable.class);
+        Foo3 proxified = AspectBinder.process(new FooImpl3(), Foo3.class);
+        String value = proxified.notCacheableMethod();
+        assertEquals("this can be cached", value);
+        value = proxified.notCacheableMethod();
+        assertEquals("correct value", value);
     }
 
 }

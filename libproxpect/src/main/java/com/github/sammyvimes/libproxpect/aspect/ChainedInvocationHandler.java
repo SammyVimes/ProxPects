@@ -1,5 +1,6 @@
 package com.github.sammyvimes.libproxpect.aspect;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.github.sammyvimes.libproxpect.proxy.AspectInvoker;
@@ -48,5 +49,14 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
 
     @Nullable
     protected abstract Object intercept(final Object receiver, final Object[] args);
+
+    @NonNull
+    public ChainedInvocationHandler getBottomHandler() {
+        ChainedInvocationHandler bottom = this;
+        while (bottom.nestedHandler != null) {
+            bottom = bottom.nestedHandler;
+        }
+        return bottom;
+    }
 
 }
