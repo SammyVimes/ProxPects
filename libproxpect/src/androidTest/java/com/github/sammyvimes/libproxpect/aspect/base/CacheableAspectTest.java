@@ -42,7 +42,7 @@ public class CacheableAspectTest extends TestCase {
 
     }
 
-    public void testCacheSomple() throws Exception {
+    public void testCacheSimple() throws Exception {
         AspectBinder.registerAspects(Cacheable.class);
         Foo proxified = AspectBinder.process(new FooImpl(), Foo.class);
         String value = proxified.getValue();

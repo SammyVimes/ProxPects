@@ -17,6 +17,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Cacheable {
 
+    //Time to cached value to live in millis
+    //-1 to live forever
     long ttl() default -1;
 
 }

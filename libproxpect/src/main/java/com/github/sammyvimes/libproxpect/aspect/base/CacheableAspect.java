@@ -36,7 +36,7 @@ public class CacheableAspect extends ChainedInvocationHandler {
 
         if (invocationCacheValue != null) {
             long curTime = System.currentTimeMillis();
-            if (curTime - invocationCacheValue.timestamp < ttl) {
+            if (ttl == -1 || curTime - invocationCacheValue.timestamp < ttl) {
                 return invocationCacheValue.value;
             }
         }
