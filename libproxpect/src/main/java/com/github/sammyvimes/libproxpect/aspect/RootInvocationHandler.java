@@ -1,6 +1,5 @@
 package com.github.sammyvimes.libproxpect.aspect;
 
-import com.github.sammyvimes.libproxpect.aspect.ChainedInvocationHandler;
 import com.github.sammyvimes.libproxpect.proxy.AspectInvoker;
 
 import java.lang.reflect.Method;
@@ -26,10 +25,15 @@ public class RootInvocationHandler implements AspectInvoker {
         return method.invoke(receiver, args);
     }
 
+
+    /**
+     * Класс нужный для хранения handler'a по ключу в Map
+     * Одни и те же методы в наследнике и родителе -- разные объекты, поэтому
+     * нужна {@link MethodWrapper#equals такая} проверка
+     */
     public static class MethodWrapper {
 
         Method method;
-
         public MethodWrapper(final Method method) {
             this.method = method;
         }
@@ -37,17 +41,19 @@ public class RootInvocationHandler implements AspectInvoker {
         @Override
         public boolean equals(final Object obj) {
             if (obj != null && obj instanceof MethodWrapper) {
-                MethodWrapper _other = (MethodWrapper)obj;
+                MethodWrapper _other = (MethodWrapper) obj;
                 Method other = _other.method;
                 if ((method.getDeclaringClass() == other.getDeclaringClass())
                         && (method.getName().equals(other.getName()))) {
-                    if (!method.getReturnType().equals(other.getReturnType()))
+                    if (!method.getReturnType().equals(other.getReturnType())) {
                         return false;
-            /* Avoid unnecessary cloning */
+                    }
+
                     Class<?>[] params1 = method.getParameterTypes();
                     Class<?>[] params2 = other.getParameterTypes();
                     if (params1.length == params2.length) {
                         for (int i = 0; i < params1.length; i++) {
+                            // это классы, поэтому можно сравнивать их через ==
                             if (params1[i] != params2[i])
                                 return false;
                         }
