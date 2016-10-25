@@ -2,11 +2,10 @@ package com.github.sammyvimes.libproxpect;
 
 import android.app.Activity;
 
-import com.github.sammyvimes.libproxpect.annotation.base.Cacheable;
+import com.github.sammyvimes.aspect.cacheable.Cacheable;
 import com.github.sammyvimes.libproxpect.proxy.AspectBinder;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

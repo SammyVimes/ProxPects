@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.github.sammyvimes.libproxpect.proxy.AspectInvoker;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -12,7 +13,9 @@ import java.lang.reflect.Method;
  */
 public abstract class ChainedInvocationHandler implements AspectInvoker {
 
-    public static final Object NOTHING = new Object();
+    protected static final Object NOTHING = new Object();
+
+    protected static final Object STOP = new Object();
 
     private ChainedInvocationHandler nestedHandler = null;
 
@@ -21,11 +24,17 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
 
     @Override
     public Object invoke(final Object receiver, final Object proxy, final Method method, final Object[] args) throws Throwable {
-        Object beforeValue = before(receiver, args);
+        Object beforeValue = before(receiver, method, args);
+        if (beforeValue == STOP) {
+            return null;
+        }
         if (beforeValue != NOTHING) {
             return beforeValue;
         }
-        Object interceptValue = intercept(receiver, args);
+        Object interceptValue = intercept(receiver, method, args);
+        if (interceptValue == STOP) {
+            return null;
+        }
         if (interceptValue != NOTHING) {
             return interceptValue;
         }
@@ -35,7 +44,10 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
         } else {
             result = method.invoke(receiver, args);
         }
-        Object afterValue = after(receiver, args, result);
+        Object afterValue = after(receiver, method, args, result);
+        if (afterValue == STOP) {
+            return null;
+        }
         return afterValue != NOTHING ? afterValue : result;
     }
 
@@ -43,14 +55,14 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
         this.nestedHandler = nestedHandler;
     }
 
-    @Nullable
-    protected abstract Object before(final Object receiver, final Object[] args);
+    @NonNull
+    protected abstract Object before(final Object receiver, final Method method, final Object[] args);
 
-    @Nullable
-    protected abstract Object after(final Object receiver, final Object[] args, final Object result);
+    @NonNull
+    protected abstract Object after(final Object receiver, final Method method, final Object[] args, final Object result);
 
-    @Nullable
-    protected abstract Object intercept(final Object receiver, final Object[] args);
+    @NonNull
+    protected abstract Object intercept(final Object receiver, final Method method, final Object[] args) throws InvocationTargetException, IllegalAccessException;
 
     @NonNull
     public ChainedInvocationHandler getBottomHandler() {

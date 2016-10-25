@@ -1,10 +1,10 @@
-package com.github.sammyvimes.libproxpect.aspect.base;
+package com.github.sammyvimes.aspect.cacheable;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
-import com.github.sammyvimes.libproxpect.annotation.base.Cacheable;
 import com.github.sammyvimes.libproxpect.aspect.ChainedInvocationHandler;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +25,9 @@ public class CacheableAspect extends ChainedInvocationHandler {
         this.ttl = cacheable.ttl();
     }
 
-    @Nullable
+    @NonNull
     @Override
-    protected Object before(final Object receiver, final Object[] args) {
+    protected Object before(final Object receiver, final Method method, final Object[] args) {
         Map<InvocationCacheKey, InvocationCacheValue> invocationCacheKeyInvocationCacheValueMap = objectMethodCallCache.get(receiver);
         if (invocationCacheKeyInvocationCacheValueMap == null) {
             return NOTHING;
@@ -44,15 +44,15 @@ public class CacheableAspect extends ChainedInvocationHandler {
         return NOTHING;
     }
 
-    @Nullable
+    @NonNull
     @Override
-    protected Object intercept(final Object receiver, final Object[] args) {
+    protected Object intercept(final Object receiver, final Method method, final Object[] args) {
         return NOTHING;
     }
 
-    @Nullable
+    @NonNull
     @Override
-    protected Object after(final Object receiver, final Object[] args, final Object result) {
+    protected Object after(final Object receiver, final Method method, final Object[] args, final Object result) {
         Map<InvocationCacheKey, InvocationCacheValue> invocationCacheKeyInvocationCacheValueMap = objectMethodCallCache.get(receiver);
         if (invocationCacheKeyInvocationCacheValueMap == null) {
             invocationCacheKeyInvocationCacheValueMap = new HashMap<>();

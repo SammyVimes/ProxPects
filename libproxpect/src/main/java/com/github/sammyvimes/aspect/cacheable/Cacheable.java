@@ -1,8 +1,6 @@
-package com.github.sammyvimes.libproxpect.annotation.base;
+package com.github.sammyvimes.aspect.cacheable;
 
 import com.github.sammyvimes.libproxpect.annotation.Aspect;
-import com.github.sammyvimes.libproxpect.aspect.ChainedInvocationHandler;
-import com.github.sammyvimes.libproxpect.aspect.base.CacheableAspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
