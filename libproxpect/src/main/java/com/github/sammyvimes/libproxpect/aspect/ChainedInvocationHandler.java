@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
  */
 public abstract class ChainedInvocationHandler implements AspectInvoker {
 
+    public static final Object NOTHING = new Object();
+
     private ChainedInvocationHandler nestedHandler = null;
 
     public ChainedInvocationHandler() {
@@ -20,11 +22,11 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
     @Override
     public Object invoke(final Object receiver, final Object proxy, final Method method, final Object[] args) throws Throwable {
         Object beforeValue = before(receiver, args);
-        if (beforeValue != null) {
+        if (beforeValue != NOTHING) {
             return beforeValue;
         }
         Object interceptValue = intercept(receiver, args);
-        if (interceptValue != null) {
+        if (interceptValue != NOTHING) {
             return interceptValue;
         }
         Object result = null;
@@ -34,7 +36,7 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
             result = method.invoke(receiver, args);
         }
         Object afterValue = after(receiver, args, result);
-        return afterValue != null ? afterValue : result;
+        return afterValue != NOTHING ? afterValue : result;
     }
 
     public void setNestedHandler(final ChainedInvocationHandler nestedHandler) {

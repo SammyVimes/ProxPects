@@ -30,7 +30,7 @@ public class CacheableAspect extends ChainedInvocationHandler {
     protected Object before(final Object receiver, final Object[] args) {
         Map<InvocationCacheKey, InvocationCacheValue> invocationCacheKeyInvocationCacheValueMap = objectMethodCallCache.get(receiver);
         if (invocationCacheKeyInvocationCacheValueMap == null) {
-            return null;
+            return NOTHING;
         }
         InvocationCacheValue invocationCacheValue = invocationCacheKeyInvocationCacheValueMap.get(new InvocationCacheKey(args));
 
@@ -41,13 +41,13 @@ public class CacheableAspect extends ChainedInvocationHandler {
             }
         }
 
-        return null;
+        return NOTHING;
     }
 
     @Nullable
     @Override
     protected Object intercept(final Object receiver, final Object[] args) {
-        return null;
+        return NOTHING;
     }
 
     @Nullable
@@ -59,7 +59,7 @@ public class CacheableAspect extends ChainedInvocationHandler {
             objectMethodCallCache.put(receiver, invocationCacheKeyInvocationCacheValueMap);
         }
         invocationCacheKeyInvocationCacheValueMap.put(new InvocationCacheKey(args), new InvocationCacheValue(System.currentTimeMillis(), result));
-        return null;
+        return NOTHING;
     }
 
     private class InvocationCacheKey {

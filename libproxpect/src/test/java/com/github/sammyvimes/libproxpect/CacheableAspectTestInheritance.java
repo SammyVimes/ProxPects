@@ -1,16 +1,24 @@
-package com.github.sammyvimes.libproxpect.aspect.base.cacheable;
+package com.github.sammyvimes.libproxpect;
 
 import android.app.Activity;
 
 import com.github.sammyvimes.libproxpect.annotation.base.Cacheable;
 import com.github.sammyvimes.libproxpect.proxy.AspectBinder;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 /**
  * Created by Semyon on 27.02.2016.
  */
-public class CacheableAspectTestInheritance extends TestCase {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class CacheableAspectTestInheritance {
 
     private interface Foo {
 
@@ -42,17 +50,18 @@ public class CacheableAspectTestInheritance extends TestCase {
 
     }
 
+    @Test
     public void testCacheSimple() throws Exception {
         AspectBinder.registerAspects(Cacheable.class);
         Foo proxified = AspectBinder.process(new FooImpl(), Foo.class);
         String value = proxified.getValue();
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         value = proxified.getValue();
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         String value2 = proxified.getValue2();
-        assertEquals("this will be cached", value2);
+        Assert.assertEquals("this will be cached", value2);
         value2 = proxified.getValue2();
-        assertEquals("this will be cached", value2);
+        Assert.assertEquals("this will be cached", value2);
     }
 
     private interface Foo2 {
@@ -85,30 +94,32 @@ public class CacheableAspectTestInheritance extends TestCase {
 
     }
 
+    @Test
     public void testMethodsWithEqualArguments() throws Exception {
         AspectBinder.registerAspects(Cacheable.class);
         Foo2 proxified = AspectBinder.process(new FooImpl2(), Foo2.class);
         String value = proxified.getValue(12, null);
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         value = proxified.getValue(12, null);
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         String value2 = proxified.getValue2(13, null, "test-string");
-        assertEquals("this will be cached", value2);
+        Assert.assertEquals("this will be cached", value2);
         value2 = proxified.getValue2(13, null, "test-string");
-        assertEquals("this will be cached", value2);
+        Assert.assertEquals("this will be cached", value2);
     }
 
+    @Test
     public void testMethodsWithNotEqualArguments() throws Exception {
         AspectBinder.registerAspects(Cacheable.class);
         Foo2 proxified = AspectBinder.process(new FooImpl2(), Foo2.class);
         String value = proxified.getValue(12, null);
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         value = proxified.getValue(13, null);
-        assertEquals("just a value", value);
+        Assert.assertEquals("just a value", value);
         String value2 = proxified.getValue2(13, null, "test-string");
-        assertEquals("this will be cached", value2);
+        Assert.assertEquals("this will be cached", value2);
         value2 = proxified.getValue2(14, null, "test-string2");
-        assertNotSame("this will be cached", value2);
+        Assert.assertNotSame("this will be cached", value2);
     }
 
     private interface Foo3 {
@@ -154,13 +165,14 @@ public class CacheableAspectTestInheritance extends TestCase {
 
     }
 
+    @Test
     public void testNotCacheableMethod() throws Exception {
         AspectBinder.registerAspects(Cacheable.class);
         Foo3 proxified = AspectBinder.process(new FooImpl3(), Foo3.class);
         String value = proxified.notCacheableMethod();
-        assertEquals("this can be cached", value);
+        Assert.assertEquals("this can be cached", value);
         value = proxified.notCacheableMethod();
-        assertEquals("correct value", value);
+        Assert.assertEquals("correct value", value);
     }
 
 }
