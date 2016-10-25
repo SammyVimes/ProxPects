@@ -13,8 +13,10 @@ import java.lang.reflect.Method;
  */
 public abstract class ChainedInvocationHandler implements AspectInvoker {
 
+    // объект который значит "ничего"
     protected static final Object NOTHING = new Object();
 
+    // объект, который сигнализирует о том, что надо остановить выполнение метода и вернуть null
     protected static final Object STOP = new Object();
 
     private ChainedInvocationHandler nestedHandler = null;
