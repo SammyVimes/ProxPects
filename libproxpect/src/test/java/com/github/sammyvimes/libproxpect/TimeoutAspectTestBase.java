@@ -8,7 +8,7 @@ import com.github.sammyvimes.libproxpect.proxy.AspectBinder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 /**
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config;
  * <p/>
  * Created by Semyon on 25.10.2016.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class TimeoutAspectTestBase {
 
