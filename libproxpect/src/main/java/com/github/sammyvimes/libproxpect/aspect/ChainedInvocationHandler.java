@@ -25,7 +25,7 @@ public abstract class ChainedInvocationHandler implements AspectInvoker {
     }
 
     @Override
-    public Object invoke(final Object receiver, final Object proxy, final Method method, final Object[] args) throws Throwable {
+    public final Object invoke(final Object receiver, final Object proxy, final Method method, final Object[] args) throws Throwable {
         Object beforeValue = before(receiver, method, args);
         if (beforeValue == STOP) {
             return null;

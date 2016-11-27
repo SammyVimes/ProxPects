@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class AspectBinder {
 
-    private static final List<Class<?>> aspects = new LinkedList<>();
+    private static final List<Class<? extends Annotation>> aspects = new LinkedList<>();
     private static final Map<Class, RootInvocationHandler> handlersMap = new HashMap<>();
 
     public static <INTERFACE, REAL_TYPE extends INTERFACE> INTERFACE process(final REAL_TYPE object,
@@ -103,6 +103,7 @@ public class AspectBinder {
         return null;
     }
 
+    @SafeVarargs
     public static void registerAspects(final Class<? extends Annotation>... annotations) {
         Collections.addAll(aspects, annotations);
     }
@@ -139,7 +140,7 @@ public class AspectBinder {
 
         Class aClass;
 
-        public AnnotationAndClass(final Annotation annotation, final Class aClass) {
+        AnnotationAndClass(final Annotation annotation, final Class aClass) {
             this.annotation = annotation;
             this.aClass = aClass;
         }
