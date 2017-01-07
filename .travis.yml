@@ -20,7 +20,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_install:
-  - cat /home/travis/.android/analytics.settings
   - chmod +x gradlew
 
 licenses:
